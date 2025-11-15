@@ -28,3 +28,5 @@ desktop/dist/
 desktop/dist-electron/
 desktop/release/
 desktop/app-config.json
+uv.lock
+.python-version
