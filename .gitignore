@@ -1,0 +1,30 @@
+# Ignore configuration files containing sensitive data
+config.py
+
+# Ignore decrypted data files
+*_decrypted.json
+*_decrypted.csv
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore logs
+*.log
+
+# Ignore backup files
+*.bak
+*~
+
+# Ignore OS specific files
+.DS_Store
+Thumbs.db
+
+# Desktop app
+desktop/node_modules/
+desktop/dist/
+desktop/dist-electron/
+desktop/release/
+desktop/app-config.json
