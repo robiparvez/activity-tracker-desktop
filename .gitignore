@@ -30,3 +30,4 @@ desktop/release/
 desktop/app-config.json
 uv.lock
 .python-version
+activity.json

@@ -1,5 +1,0 @@
-cryptography
-pandas
-matplotlib
-seaborn
-numpy

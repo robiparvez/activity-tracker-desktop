@@ -82,9 +82,11 @@ function decryptValue(encryptedValue: string, key: string): string {
     }
 }
 
-function parseTime(seconds: number): string {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
+function parseTime(timestamp: number): string {
+    // Convert timestamp (seconds since epoch) to Date object
+    const date = new Date(timestamp * 1000)
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
     const period = hours >= 12 ? 'PM' : 'AM'
     const displayHours = hours % 12 || 12
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`
