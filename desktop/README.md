@@ -32,11 +32,8 @@ The installer will be created in the `release/` directory.
 ## Documentation
 
 - **README.md** - This file (quick start)
-- **DESKTOP-README.md** - Full desktop app documentation
 - **INSTALLATION-GUIDE.md** - Detailed setup instructions
 - **DEVELOPMENT-NOTES.md** - Technical architecture details
-- **PROJECT-SUMMARY.md** - Complete project overview
-- **QUICK-REFERENCE.md** - Quick reference card
 
 ## Configuration
 
@@ -86,7 +83,7 @@ desktop/
 ## Tech Stack
 
 **Frontend:** React 18 + TypeScript + TailwindCSS + shadcn/ui
-**Backend:** Electron + Node.js + SQL.js
+**Backend:** Electron + Node.js + better-sqlite3
 **Charts:** Recharts
 **Build:** Vite + electron-builder
 

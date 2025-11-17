@@ -36,10 +36,9 @@ npm run electron:build
 
 - [desktop/README.md](./desktop/README.md) - Quick start
 - [desktop/INSTALLATION-GUIDE.md](./desktop/INSTALLATION-GUIDE.md) - Detailed setup
-- [desktop/DESKTOP-README.md](./desktop/DESKTOP-README.md) - Full documentation
-- [desktop/PROJECT-SUMMARY.md](./desktop/PROJECT-SUMMARY.md) - What was built
+- [desktop/DEVELOPMENT-NOTES.md](./desktop/DEVELOPMENT-NOTES.md) - Technical details
 
-**Note:** If you have Node.js 14 or need to avoid Node.js update, continue using the Python CLI tool below.
+**Status:** ✅ Fully functional and production-ready (v1.0.0 installer available in `release/`)
 
 ---
 

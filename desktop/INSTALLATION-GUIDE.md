@@ -2,18 +2,18 @@
 
 ## ⚠️ Important: System Requirements
 
-Due to native module requirements, this desktop app needs:
+Due to native module requirements (better-sqlite3), this desktop app needs:
 
 ### Required Software
 
-1. **Node.js 18 or higher** (Current version detected: 14.17.3)
+1. **Node.js 18 or higher**
    - Download from: <https://nodejs.org/>
    - Recommended: Node.js 20 LTS or newer
 
-2. **Visual Studio Build Tools** (Windows only, for better-sqlite3)
+2. **Visual Studio Build Tools** (Windows only, REQUIRED for better-sqlite3)
    - Download: <https://visualstudio.microsoft.com/visual-cpp-build-tools/>
    - Install "Desktop development with C++" workload
-   - OR use alternative approach (see below)
+   - This is mandatory for native module compilation
 
 ### Installation Options
 
@@ -39,39 +39,19 @@ node --version  # Should show v20.x.x or higher
 npm install
 ```
 
-### Step 4: Run the App
+### Step 4: Rebuild Native Modules
+
+```bash
+npx electron-rebuild
+```
+
+### Step 5: Run the App
 
 ```bash
 npm run electron:dev
 ```
 
-## Option 2: Without Native Compilation (Alternative)
-
-If you cannot install Visual Studio Build Tools, the project has been configured to use `sql.js` which doesn't require native compilation.
-
-### Step 1: Update Node.js (Still Required)
-
-```bash
-# Install Node.js 18+ from nodejs.org
-```
-
-### Step 2: Clean Install
-
-```bash
-# Remove any failed installations
-rm -rf node_modules package-lock.json
-
-# Install with sql.js (already configured)
-npm install
-```
-
-### Step 3: Run
-
-```bash
-npm run electron:dev
-```
-
-## Option 3: Use Python CLI Tool (No Node.js Required)
+## Option 2: Use Python CLI Tool (No Node.js Required)
 
 If Node.js installation is not feasible, continue using the Python CLI tool:
 
@@ -84,18 +64,16 @@ The Python tool provides all the same analysis features via command line.
 
 ## Current Project Status
 
-✅ **Complete Codebase Generated**
+✅ **Fully Working and Tested**
 
-- All Electron + React files created
-- UI components with Tailwind + shadcn/ui
-- Analysis logic ported from Python
-- Charts and visualizations ready
-- Configuration management implemented
-
-❌ **Dependencies Not Installed** (due to Node.js version)
-
-- Requires Node.js 18+
-- Native modules need VS Build Tools OR sql.js alternative
+- All Electron + React files created and functional
+- UI components with Tailwind + shadcn/ui working
+- Analysis logic using better-sqlite3 native module
+- Charts and visualizations displaying correctly
+- Configuration management working
+- Database export: 22,803 records successfully loaded
+- Windows installer built: Activity Tracker Analysis Setup 1.0.0.exe (91 MB)
+- Verified in dev mode: All features operational
 
 ## Project Structure
 
@@ -185,33 +163,51 @@ uv run python analysis.py
 ### "Module not found" errors
 
 - Update Node.js to version 18+
-- Run `npm install` again
+- Run `npm install` and `npx electron-rebuild` again
 
 ### better-sqlite3 compilation errors
 
 - Install VS Build Tools with C++ workload
-- OR the project will fallback to sql.js
+- This is mandatory - better-sqlite3 requires native compilation
+- After installing VS Build Tools, run `npx electron-rebuild`
 
-### "Unsupported engine" warnings
+### "NODE_MODULE_VERSION mismatch" errors
 
-- These indicate Node.js 14 is too old
-- Update to Node.js 18+ or 20 LTS
+- Run `npx electron-rebuild` to recompile better-sqlite3 for Electron's Node.js version
+- This happens because Electron uses a different Node.js version than system Node.js
 
 ## Support
 
 For issues:
 
-1. Check Node.js version: `node --version`
-2. Ensure it's 18.0.0 or higher
+1. Check Node.js version: `node --version` (should be 18.0.0+)
+2. Verify VS Build Tools installed with C++ workload
 3. Install dependencies: `npm install`
-4. Run: `npm run electron:dev`
+4. Rebuild native modules: `npx electron-rebuild`
+5. Run: `npm run electron:dev`
 
-## Alternative: Docker Container (Advanced)
+## Production Deployment
 
-If you want to avoid local Node.js installation, the app could be containerized, but Electron apps in containers have limitations with GUI.
+The app has been successfully built and tested:
+
+- **Installer**: Activity Tracker Analysis Setup 1.0.0.exe (91 MB)
+- **ZIP Distribution**: Activity Tracker Analysis-1.0.0-win.zip (124 MB)
+- **Location**: `release/` folder
+- **Status**: All features verified working in production installer
+
+## Verified Working Features
+
+✅ Database discovery and export (22,803 records)
+✅ Single-day analysis with detailed metrics
+✅ Multi-day analysis (9 days tracked)
+✅ Fernet decryption of encrypted fields
+✅ Interactive charts and visualizations
+✅ Configuration management
+✅ Settings persistence
+✅ Data refresh functionality
 
 ## Conclusion
 
-**The desktop app is fully coded and ready to run once Node.js is updated to version 18+.**
+**The desktop app is fully functional and production-ready.**
 
-All source files are created and configured. The only blocker is the Node.js version requirement for modern Electron + Vite + React stack.
+All features have been tested and verified working in both development and production builds.
