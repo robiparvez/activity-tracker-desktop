@@ -30,8 +30,8 @@ export default function Dashboard({ selectedDate, analysisData }: DashboardProps
                     <p className='text-muted-foreground'>{formattedDate}</p>
                 </div>
                 <div className='text-right'>
-                    <div className='text-4xl font-bold'>{data.productivityEmoji}</div>
-                    <p className='text-sm text-muted-foreground capitalize'>{data.productivity}</p>
+                    <div className='text-4xl font-bold'>{data?.productivityEmoji}</div>
+                    <p className='text-sm text-muted-foreground capitalize'>{data?.productivity}</p>
                 </div>
             </div>
 
@@ -43,9 +43,9 @@ export default function Dashboard({ selectedDate, analysisData }: DashboardProps
                         <Clock className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold'>{data.totalHours}h</div>
+                        <div className='text-2xl font-bold'>{data?.totalHours}h</div>
                         <p className='text-xs text-muted-foreground'>
-                            {data.startTime} - {data.endTime}
+                            {data?.startTime} - {data?.endTime}
                         </p>
                     </CardContent>
                 </Card>
@@ -56,7 +56,7 @@ export default function Dashboard({ selectedDate, analysisData }: DashboardProps
                         <Activity className='h-4 w-4 text-green-500' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold text-green-500'>{data.activeHours}h</div>
+                        <div className='text-2xl font-bold text-green-500'>{data?.activeHours}h</div>
                         <p className='text-xs text-muted-foreground'>Productive work time</p>
                     </CardContent>
                 </Card>
@@ -67,7 +67,7 @@ export default function Dashboard({ selectedDate, analysisData }: DashboardProps
                         <TrendingUp className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold'>{data.activityRate}%</div>
+                        <div className='text-2xl font-bold'>{data?.activityRate}%</div>
                         <p className='text-xs text-muted-foreground'>Overall productivity</p>
                     </CardContent>
                 </Card>
@@ -78,8 +78,8 @@ export default function Dashboard({ selectedDate, analysisData }: DashboardProps
                         <Calendar className='h-4 w-4 text-orange-500' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold text-orange-500'>{data.inactiveHours}h</div>
-                        <p className='text-xs text-muted-foreground'>Including {data.afkHours}h AFK</p>
+                        <div className='text-2xl font-bold text-orange-500'>{data?.inactiveHours}h</div>
+                        <p className='text-xs text-muted-foreground'>Including {data?.afkHours}h AFK</p>
                     </CardContent>
                 </Card>
             </div>
@@ -94,7 +94,7 @@ export default function Dashboard({ selectedDate, analysisData }: DashboardProps
                         <ResponsiveContainer width='100%' height={300}>
                             <PieChart>
                                 <Pie data={pieData} cx='50%' cy='50%' labelLine={false} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} outerRadius={80} fill='#8884d8' dataKey='value'>
-                                    {pieData.map((_, index) => (
+                                    {pieData?.map((_, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
