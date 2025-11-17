@@ -1,5 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
+import { app } from 'electron'
 
 export interface Config {
     decryptionKey: string
@@ -7,7 +8,8 @@ export interface Config {
     dbPath?: string
 }
 
-const CONFIG_PATH = path.join(process.cwd(), 'app-config.json')
+// Store config in user's AppData folder instead of Program Files
+const CONFIG_PATH = path.join(app.getPath('userData'), 'app-config.json')
 
 const DEFAULT_CONFIG: Config = {
     decryptionKey: '',

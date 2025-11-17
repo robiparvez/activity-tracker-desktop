@@ -2,10 +2,7 @@ import path from 'path'
 import fs from 'fs/promises'
 import os from 'os'
 import { app } from 'electron'
-import { exec } from 'child_process'
-import { promisify } from 'util'
-
-const execAsync = promisify(exec)
+import Database from 'better-sqlite3'
 
 const DB_PATH = path.join(
     os.homedir(),
@@ -15,7 +12,8 @@ const DB_PATH = path.join(
     'local_activity.db'
 )
 
-const JSON_OUTPUT_PATH = path.join(process.cwd(), 'activity.json')
+// Use userData directory for JSON output (writable location)
+const JSON_OUTPUT_PATH = path.join(app.getPath('userData'), 'activity.json')
 
 export async function discoverDatabase(): Promise<string> {
     try {
@@ -29,85 +27,68 @@ export async function discoverDatabase(): Promise<string> {
     }
 }
 
+function serializeValue(value: any): any {
+    // Convert Buffer to base64 string for JSON serialization
+    if (Buffer.isBuffer(value)) {
+        return value.toString('base64')
+    }
+    return value
+}
+
 export async function exportToJson(): Promise<string> {
     try {
         const dbPath = await discoverDatabase()
+        console.log('Exporting database using better-sqlite3...')
 
-        // Use Python script to export database (avoids sql.js WASM issues in Electron)
-        const appPath = app.getAppPath()
-        const pythonScript = path.join(appPath, '..', 'export_db.py')
+        // Open database with better-sqlite3
+        const db = new Database(dbPath, { readonly: true })
 
-        console.log('Exporting database using Python script...')
+        // Calculate date 10 days ago for manageable dataset
+        const tenDaysAgo = new Date()
+        tenDaysAgo.setDate(tenDaysAgo.getDate() - 10)
+        const tenDaysAgoStr = tenDaysAgo.toISOString().split('T')[0]
 
-        // Create a simple Python script to export SQLite to JSON
-        const scriptContent = `
-import sqlite3
-import json
-import sys
-import base64
-from datetime import datetime, timedelta
+        // Get all tables
+        const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as Array<{ name: string }>
 
-db_path = r"${dbPath.replace(/\\/g, '\\\\')}"
-output_path = r"${JSON_OUTPUT_PATH.replace(/\\/g, '\\\\')}"
+        const data: Record<string, any[]> = {}
 
-def serialize_value(value):
-    """Convert bytes to base64 string for JSON serialization"""
-    if isinstance(value, bytes):
-        return base64.b64encode(value).decode('utf-8')
-    return value
+        for (const { name: tableName } of tables) {
+            if (tableName === 'sqlite_sequence') {
+                continue
+            }
 
-try:
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+            // Check if table has start_time column
+            const tableInfo = db.prepare(`PRAGMA table_info(${tableName})`).all() as Array<{ name: string }>
+            const hasStartTime = tableInfo.some(col => col.name === 'start_time')
 
-    # Calculate date 10 days ago for manageable dataset
-    ten_days_ago = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')    # Get all tables
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-    tables = cursor.fetchall()
+            // Build query
+            const query = hasStartTime
+                ? `SELECT * FROM ${tableName} WHERE start_time >= ?`
+                : `SELECT * FROM ${tableName}`
 
-    data = {}
-    for (table_name,) in tables:
-        if table_name == 'sqlite_sequence':
-            continue
-        # Only export records from last 90 days if table has start_time column
-        cursor.execute(f"PRAGMA table_info({table_name})")
-        columns_info = cursor.fetchall()
-        has_start_time = any(col[1] == 'start_time' for col in columns_info)
+            // Execute query
+            const rows = hasStartTime
+                ? db.prepare(query).all(tenDaysAgoStr)
+                : db.prepare(query).all()
 
-        if has_start_time:
-            query = f"SELECT * FROM {table_name} WHERE start_time >= '{ten_days_ago}'"
-        else:
-            query = f"SELECT * FROM {table_name}"
-
-        cursor.execute(query)
-        columns = [description[0] for description in cursor.description]
-        rows = cursor.fetchall()
-        # Convert bytes to base64 for JSON serialization
-        data[table_name] = [dict(zip(columns, [serialize_value(v) for v in row])) for row in rows]
-
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, default=str)
-
-    conn.close()
-    print(f"Success: {output_path}")
-except Exception as e:
-    print(f"Error: {str(e)}", file=sys.stderr)
-    sys.exit(1)
-`
-        await fs.writeFile(pythonScript, scriptContent, 'utf-8')
-
-        // Execute Python script
-        const { stdout, stderr } = await execAsync(`python "${pythonScript}"`)
-
-        if (stderr && !stderr.includes('Success')) {
-            throw new Error(stderr)
+            // Serialize values (convert buffers to base64)
+            data[tableName] = rows.map((row: any) => {
+                const serialized: Record<string, any> = {}
+                for (const [key, value] of Object.entries(row)) {
+                    serialized[key] = serializeValue(value)
+                }
+                return serialized
+            })
         }
 
-        console.log('Database export completed:', stdout)
+        // Close database
+        db.close()
 
-        // Clean up temp script
-        await fs.unlink(pythonScript).catch(() => {})
+        // Write to JSON file
+        await fs.writeFile(JSON_OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf-8')
 
+        console.log('Database export completed:', JSON_OUTPUT_PATH)
         return JSON_OUTPUT_PATH
     } catch (error) {
         console.error('Database export failed:', error)
