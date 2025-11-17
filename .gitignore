@@ -5,6 +5,10 @@ config.py
 *_decrypted.json
 *_decrypted.csv
 
+# Ignore large activity data files
+activity.json
+desktop/activity.json
+
 # Ignore Python cache
 __pycache__/
 *.pyc

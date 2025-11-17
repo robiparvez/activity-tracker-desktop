@@ -60,8 +60,8 @@ try:
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    # Calculate date 7 days ago for manageable dataset
-    seven_days_ago = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')    # Get all tables
+    # Calculate date 10 days ago for manageable dataset
+    ten_days_ago = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')    # Get all tables
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
     tables = cursor.fetchall()
 
@@ -75,7 +75,7 @@ try:
         has_start_time = any(col[1] == 'start_time' for col in columns_info)
 
         if has_start_time:
-            query = f"SELECT * FROM {table_name} WHERE start_time >= '{seven_days_ago}'"
+            query = f"SELECT * FROM {table_name} WHERE start_time >= '{ten_days_ago}'"
         else:
             query = f"SELECT * FROM {table_name}"
 

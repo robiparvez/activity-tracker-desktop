@@ -100,7 +100,7 @@ uv run python analysis.py
 └── ⚙️ Settings Tab
     ├── Database path (auto-detected)
     ├── Decryption key input
-    ├── Employee ID config
+    ├── Hostname config
     └── Refresh data button
 ```
 

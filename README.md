@@ -93,7 +93,7 @@ The `analysis.py` script is a comprehensive work hours analysis tool that provid
 
 - Loads encrypted activity data from `activity.json`
 - Decrypts duration and AFK status using Fernet encryption
-- Filters data by employee ID and date ranges
+- Filters data by Hostname and date ranges
 
 **Analysis Types:**
 
@@ -149,6 +149,6 @@ The `analysis.py` script is a comprehensive work hours analysis tool that provid
 The script requires a `config.py` file with:
 
 - `DECRYPTION_KEY`: Fernet encryption key for data decryption
-- `EMPLOYEE_ID`: Target employee identifier for filtering
+- `HOSTNAME`: Target hostname for filtering
 
 This tool helps analyze work patterns, identify productivity trends, and optimize time management strategies.

@@ -1,19 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, Clock, TrendingUp, Calendar } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useDashboard, COLORS } from '@/hooks/useDashboard';
 
 interface DashboardProps {
     selectedDate: string | null;
     analysisData: any;
 }
 
-const COLORS = ['#10b981', '#ef4444', '#f59e0b'];
-
 export default function Dashboard({ selectedDate, analysisData }: DashboardProps) {
-    console.log('[Dashboard] Render with:', { selectedDate, analysisData })
+    const { isEmpty, formattedDate, pieData, barData, data } = useDashboard(selectedDate, analysisData);
 
-    if (!selectedDate || !analysisData) {
-        console.log('[Dashboard] Showing empty state - selectedDate:', selectedDate, 'analysisData:', analysisData)
+    if (isEmpty) {
         return (
             <div className='flex items-center justify-center h-full'>
                 <div className='text-center space-y-4'>
@@ -24,36 +22,12 @@ export default function Dashboard({ selectedDate, analysisData }: DashboardProps
         );
     }
 
-    const data = analysisData;
-
-    const pieData = [
-        { name: 'Active', value: data.activeHours },
-        { name: 'Inactive', value: data.inactiveHours },
-        { name: 'AFK', value: data.afkHours }
-    ];
-
-    const barData = [
-        {
-            name: 'Hours',
-            Active: data.activeHours,
-            Inactive: data.inactiveHours,
-            AFK: data.afkHours
-        }
-    ];
-
     return (
         <div className='space-y-6'>
             <div className='flex items-center justify-between'>
                 <div>
                     <h2 className='text-3xl font-bold tracking-tight'>Daily Analysis</h2>
-                    <p className='text-muted-foreground'>
-                        {new Date(selectedDate).toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })}
-                    </p>
+                    <p className='text-muted-foreground'>{formattedDate}</p>
                 </div>
                 <div className='text-right'>
                     <div className='text-4xl font-bold'>{data.productivityEmoji}</div>

@@ -29,7 +29,7 @@ The app should also:
 - Provide detailed daily/multi-day productivity analytics
 - Render charts & summaries with a modern dashboard UI
 - Allow the user to browse dates, employees, metrics
-- Allow configuration editing (decryption key, employee ID, output settings)
+- Allow configuration editing (decryption key, hostname, output settings)
 
 ---
 
@@ -121,7 +121,7 @@ Use:
 
 4. **Configuration Panel**
    - Enter decryption key
-   - Select employee ID
+   - Select Hostname
    - View discovered DB path
    - Regenerate JSON
    - Toggle settings

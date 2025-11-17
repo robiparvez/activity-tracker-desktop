@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { TrendingUp, Calendar, Activity, Clock } from 'lucide-react';
+import { useSummary } from '@/hooks/useSummary';
 
 interface SummaryProps {
     dates: string[];
@@ -8,7 +9,9 @@ interface SummaryProps {
 }
 
 export default function Summary({ dates, multiDayData }: SummaryProps) {
-    if (!multiDayData || dates.length === 0) {
+    const { isEmpty, data, trendData, reversedDailyBreakdown, formatDate } = useSummary(dates, multiDayData);
+
+    if (isEmpty) {
         return (
             <div className='flex items-center justify-center h-full'>
                 <div className='text-center space-y-4'>
@@ -19,20 +22,11 @@ export default function Summary({ dates, multiDayData }: SummaryProps) {
         );
     }
 
-    const data = multiDayData;
-
-    const trendData = data.dailyBreakdown.map((day: any) => ({
-        date: new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        active: day.activeHours,
-        inactive: day.inactiveHours,
-        rate: day.activityRate
-    }));
-
     return (
         <div className='space-y-6'>
             <div>
                 <h2 className='text-3xl font-bold tracking-tight'>Multi-Day Summary</h2>
-                <p className='text-muted-foreground'>Analysis of {data.totalDays} days of activity</p>
+                <p className='text-muted-foreground'>Analysis of {data?.totalDays} days of activity</p>
             </div>
 
             {/* Summary Cards */}
@@ -43,8 +37,8 @@ export default function Summary({ dates, multiDayData }: SummaryProps) {
                         <Activity className='h-4 w-4 text-green-500' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold text-green-500'>{data.totalActiveHours}h</div>
-                        <p className='text-xs text-muted-foreground'>Across {data.totalDays} days</p>
+                        <div className='text-2xl font-bold text-green-500'>{data?.totalActiveHours}h</div>
+                        <p className='text-xs text-muted-foreground'>Across {data?.totalDays} days</p>
                     </CardContent>
                 </Card>
 
@@ -54,7 +48,7 @@ export default function Summary({ dates, multiDayData }: SummaryProps) {
                         <Clock className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold'>{data.averageActiveHours}h</div>
+                        <div className='text-2xl font-bold'>{data?.averageActiveHours}h</div>
                         <p className='text-xs text-muted-foreground'>Active hours daily</p>
                     </CardContent>
                 </Card>
@@ -65,7 +59,7 @@ export default function Summary({ dates, multiDayData }: SummaryProps) {
                         <TrendingUp className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold'>{data.overallActivityRate}%</div>
+                        <div className='text-2xl font-bold'>{data?.overallActivityRate}%</div>
                         <p className='text-xs text-muted-foreground'>Productivity metric</p>
                     </CardContent>
                 </Card>
@@ -76,7 +70,7 @@ export default function Summary({ dates, multiDayData }: SummaryProps) {
                         <Calendar className='h-4 w-4 text-muted-foreground' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold'>{data.totalTrackedHours}h</div>
+                        <div className='text-2xl font-bold'>{data?.totalTrackedHours}h</div>
                         <p className='text-xs text-muted-foreground'>All recorded time</p>
                     </CardContent>
                 </Card>
@@ -127,15 +121,11 @@ export default function Summary({ dates, multiDayData }: SummaryProps) {
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-2'>
-                        {[...data.dailyBreakdown].reverse().map((day: any) => (
+                        {reversedDailyBreakdown.map(day => (
                             <div key={day.date} className='flex items-center justify-between p-3 border rounded-lg'>
                                 <div>
                                     <p className='font-medium'>
-                                        {new Date(day.date).toLocaleDateString('en-US', {
-                                            weekday: 'short',
-                                            month: 'short',
-                                            day: 'numeric'
-                                        })}
+                                        {formatDate(day.date)}
                                     </p>
                                     <p className='text-sm text-muted-foreground'>
                                         {day.activeHours}h active • {day.inactiveHours}h inactive

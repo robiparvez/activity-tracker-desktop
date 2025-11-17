@@ -108,7 +108,7 @@ A complete, production-ready desktop application for Activity Tracker analysis w
 ### Configuration
 - ✅ Easy settings panel
 - ✅ Decryption key management
-- ✅ Employee ID configuration
+- ✅ Hostname configuration
 - ✅ Persistent storage
 
 ### Technical Excellence

@@ -44,7 +44,7 @@ On first run, configure your settings:
 
 1. Open Settings tab
 2. Enter your Fernet decryption key
-3. Enter your employee ID
+3. Enter your Hostname
 4. Save configuration
 
 ## Project Structure

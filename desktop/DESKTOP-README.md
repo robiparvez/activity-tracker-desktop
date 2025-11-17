@@ -32,7 +32,7 @@ npm install
 First time setup requires:
 
 - Your Fernet decryption key (from your ActivityTracker config)
-- Your employee ID
+- Your host name
 
 These can be configured through the Settings tab in the app.
 
@@ -57,7 +57,7 @@ The installer will be created in the `release/` directory.
 1. **Settings Configuration**
    - Navigate to the Settings tab
    - Enter your decryption key from ActivityTracker
-   - Enter your employee ID
+   - Enter your host name
    - Click "Save Configuration"
 
 2. **Refresh Data**
@@ -201,7 +201,7 @@ The installer will be created in `release/` directory with:
 
 ### No Data Displayed
 
-- Check that your employee ID is correct
+- Check that your Hostname is correct
 - Verify data exists for the selected dates
 - Try refreshing the data from Settings
 

@@ -121,7 +121,6 @@ export async function getAvailableDates(config: Config): Promise<string[]> {
 
         return Array.from(dates).sort()
     } catch (error) {
-        // Return empty array if no data available yet
         return []
     }
 }

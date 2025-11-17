@@ -59,7 +59,7 @@ npm run electron:build
 Before first use, configure in Settings:
 
 1. **Decryption Key** - Your Fernet encryption key from ActivityTracker
-2. **Employee ID** - Your employee identifier for data filtering
+2. **Hostname** - Your Hostname for data filtering
 
 ## Database Structure Expected
 

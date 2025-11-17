@@ -28,7 +28,7 @@ echo 🎯 Starting Activity Tracker Desktop App...
 echo.
 echo 📝 Don't forget to configure your settings on first launch:
 echo    - Decryption Key ^(from your ActivityTracker config^)
-echo    - Employee ID ^(your identifier^)
+echo    - Hostname ^(your identifier^)
 echo.
 
 call npm run electron:dev

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Database, Key, User, RefreshCw } from 'lucide-react';
+import { useSettings } from '@/hooks/useSettings';
 
 interface SettingsProps {
     onConfigUpdate: () => void;
@@ -11,91 +11,10 @@ interface SettingsProps {
 }
 
 export default function Settings({ onConfigUpdate, onTabChange }: SettingsProps) {
-    const [config, setConfig] = useState({ decryptionKey: '', employeeId: '', dbPath: '' });
-    const [dbPath, setDbPath] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
-    const [errors, setErrors] = useState({ decryptionKey: '', employeeId: '' });
+    const { config, dbPath, loading, message, errors, handleConfigChange, handleSave, handleRefresh } = useSettings(onConfigUpdate, onTabChange);
 
-    useEffect(() => {
-        loadConfig();
-        discoverDb();
-    }, []);
-
-    const loadConfig = async () => {
-        const result = await window.electronAPI.getConfig();
-        if (result.success && result.config) {
-            setConfig(result.config);
-        }
-    };
-
-    const discoverDb = async () => {
-        const result = await window.electronAPI.discoverDatabase();
-        if (result.success && result.path) {
-            setDbPath(result.path);
-        }
-    };
-
-    const handleSave = async () => {
-        // Validate required fields
-        const newErrors = { decryptionKey: '', employeeId: '' };
-        let hasErrors = false;
-
-        if (!config.decryptionKey.trim()) {
-            newErrors.decryptionKey = 'Decryption key is required';
-            hasErrors = true;
-        }
-
-        if (!config.employeeId.trim()) {
-            newErrors.employeeId = 'Employee ID is required';
-            hasErrors = true;
-        }
-
-        setErrors(newErrors);
-
-        if (hasErrors) {
-            setMessage('Please fill in all required fields');
-            return;
-        }
-
-        setLoading(true);
-        setMessage('');
-
-        const result = await window.electronAPI.setConfig(config);
-
-        if (result.success) {
-            setMessage('Configuration saved successfully!');
-            onConfigUpdate();
-            // Navigate to Summary tab after successful save
-            setTimeout(() => {
-                if (onTabChange) onTabChange('summary');
-            }, 500);
-        } else {
-            setMessage(`Error: ${result.error}`);
-        }
-
-        setLoading(false);
-    };
-
-    const handleRefresh = async () => {
-        setLoading(true);
-        setMessage('');
-
-        const result = await window.electronAPI.refreshData();
-
-        if (result.success) {
-            setMessage('Data refreshed successfully!');
-            onConfigUpdate();
-            // Navigate to Summary tab after successful refresh
-            setTimeout(() => {
-                if (onTabChange) onTabChange('summary');
-            }, 500);
-        } else {
-            setMessage(`Error: ${result.error}`);
-        }
-
-        setLoading(false);
-    };
+    // Calculate agent.key path from database path
+    const agentKeyPath = dbPath ? dbPath.replace('local_activity.db', 'agent.key') : '';
 
     return (
         <div className='space-y-6'>
@@ -118,7 +37,7 @@ export default function Settings({ onConfigUpdate, onTabChange }: SettingsProps)
                             <div className='space-y-4'>
                                 <Button onClick={handleRefresh} disabled={loading || !dbPath} className='w-full' variant='outline'>
                                     <RefreshCw className='mr-2 h-4 w-4' />
-                                    Refresh Data from Database
+                                    Refresh
                                 </Button>
                                 <p className='text-xs text-muted-foreground'>Click to re-export the latest data from ActivityTracker database.</p>
                             </div>
@@ -156,19 +75,14 @@ export default function Settings({ onConfigUpdate, onTabChange }: SettingsProps)
                                 <Label htmlFor='decryption-key'>
                                     Decryption Key <span className='text-destructive'>*</span>
                                 </Label>
-                                <Input
-                                    id='decryption-key'
-                                    type='password'
-                                    value={config.decryptionKey}
-                                    onChange={e => {
-                                        setConfig({ ...config, decryptionKey: e.target.value });
-                                        setErrors({ ...errors, decryptionKey: '' });
-                                    }}
-                                    placeholder='Enter your Fernet decryption key'
-                                    className={errors.decryptionKey ? 'border-destructive' : ''}
-                                />
+                                <Input id='decryption-key' type='password' value={config.decryptionKey} onChange={e => handleConfigChange('decryptionKey', e.target.value)} placeholder='Enter your Fernet decryption key' className={errors.decryptionKey ? 'border-destructive' : ''} />
                                 {errors.decryptionKey && <p className='text-sm text-destructive'>{errors.decryptionKey}</p>}
                                 <p className='text-xs text-muted-foreground'>This key is required to decrypt duration and AFK status from your activity data.</p>
+                                {agentKeyPath && (
+                                    <p className='text-xs text-muted-foreground'>
+                                        Find it at: <code className='bg-muted px-1 py-0.5 rounded text-xs break-all'>{agentKeyPath}</code>
+                                    </p>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -177,26 +91,20 @@ export default function Settings({ onConfigUpdate, onTabChange }: SettingsProps)
                         <CardHeader>
                             <CardTitle className='flex items-center gap-2'>
                                 <User className='h-5 w-5' />
-                                Employee ID
+                                Hostname
                             </CardTitle>
-                            <CardDescription>Your employee identifier for filtering data</CardDescription>
+                            <CardDescription>Your hostname for filtering data</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className='space-y-2'>
                                 <Label htmlFor='employee-id'>
-                                    Employee ID <span className='text-destructive'>*</span>
+                                    Hostname <span className='text-destructive'>*</span>
                                 </Label>
-                                <Input
-                                    id='employee-id'
-                                    value={config.employeeId}
-                                    onChange={e => {
-                                        setConfig({ ...config, employeeId: e.target.value });
-                                        setErrors({ ...errors, employeeId: '' });
-                                    }}
-                                    placeholder='Enter your employee ID'
-                                    className={errors.employeeId ? 'border-destructive' : ''}
-                                />
+                                <Input id='employee-id' value={config.employeeId} onChange={e => handleConfigChange('employeeId', e.target.value)} placeholder='Enter your hostname' className={errors.employeeId ? 'border-destructive' : ''} />
                                 {errors.employeeId && <p className='text-sm text-destructive'>{errors.employeeId}</p>}
+                                <p className='text-xs text-muted-foreground'>
+                                    Run <code className='bg-muted px-1 py-0.5 rounded'>hostname</code> command in CMD to find your hostname.
+                                </p>
                             </div>
                         </CardContent>
                     </Card>

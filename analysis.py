@@ -141,7 +141,7 @@ class ActivityAnalyzer:
     def _filter_records_by_date_and_employee(
         self, data: List[Dict], target_date: str
     ) -> List[ActivityRecord]:
-        """Filter records by date and employee ID."""
+        """Filter records by date and hostname."""
         records = []
 
         for record in data:
